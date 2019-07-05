@@ -40,10 +40,9 @@
         _textField = [[UITextField alloc] initWithFrame:CGRectZero];
         _textField.borderStyle = UITextBorderStyleRoundedRect;
         _textField.inputView = ({
-            APNumberPad *numberPad = [APNumberPad numberPadWithDelegate:self];
-
-            [numberPad.leftFunctionButton setTitle:@"B" forState:UIControlStateNormal];
-            numberPad.leftFunctionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+            APNumberPad *numberPad = [APNumberPad numberPad];
+//            [numberPad.leftFunctionButton setTitle:@"B" forState:UIControlStateNormal];
+//            numberPad.leftFunctionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
             numberPad;
         });
     }

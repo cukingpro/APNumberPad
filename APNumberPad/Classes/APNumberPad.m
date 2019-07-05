@@ -55,6 +55,10 @@
 
 @implementation APNumberPad
 
++ (instancetype)numberPad {
+    return [self numberPadWithDelegate:nil numberPadStyleClass:nil];
+}
+
 + (instancetype)numberPadWithDelegate:(id<APNumberPadDelegate>)delegate {
     return [self numberPadWithDelegate:delegate numberPadStyleClass:nil];
 }
@@ -90,6 +94,7 @@
         self.leftButton = [self functionButton];
         self.leftButton.titleLabel.font = [self.styleClass functionButtonFont];
         [self.leftButton setTitleColor:[self.styleClass functionButtonTextColor] forState:UIControlStateNormal];
+        [self.leftFunctionButton setTitle:@"." forState:UIControlStateNormal];
         [self.leftButton addTarget:self action:@selector(functionButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.leftButton];
 
@@ -422,9 +427,30 @@
     if (!self.textInput) {
         return;
     }
-
-    if ([self.delegate respondsToSelector:@selector(numberPad:functionButtonAction:textInput:)]) {
-        [self.delegate numberPad:self functionButtonAction:sender textInput:self.textInput];
+    
+    NSString *text = @".";
+    
+    if (_delegateFlags.textInputSupportsShouldChangeTextInRange) {
+        if ([self.textInput shouldChangeTextInRange:self.textInput.selectedTextRange replacementText:text]) {
+            [self.textInput insertText:text];
+        }
+    }
+    else if (_delegateFlags.delegateSupportsTextFieldShouldChangeCharactersInRange) {
+        NSRange selectedRange = [[self class] selectedRange:self.textInput];
+        UITextField *textField = (UITextField *)self.textInput;
+        if ([textField.delegate textField:textField shouldChangeCharactersInRange:selectedRange replacementString:text]) {
+            [self.textInput insertText:text];
+        }
+    }
+    else if (_delegateFlags.delegateSupportsTextViewShouldChangeTextInRange) {
+        NSRange selectedRange = [[self class] selectedRange:self.textInput];
+        UITextView *textView = (UITextView *)self.textInput;
+        if ([textView.delegate textView:textView shouldChangeTextInRange:selectedRange replacementText:text]) {
+            [self.textInput insertText:text];
+        }
+    }
+    else {
+        [self.textInput insertText:text];
     }
 }
 
